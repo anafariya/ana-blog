@@ -21,6 +21,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/studio/[[...index]]/head.jsx", "src/app/studio/[[...index]]/loading.jsx", "lib/sanity.preview.js"],
   "exclude": ["node_modules"]
 }
