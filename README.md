@@ -3,6 +3,9 @@
 
 This project is a blog website built using Next.js, TypeScript, Tailwind CSS, and React Portable Text Components for rendering rich text content. The content management system (CMS) used is Sanity.io.
 
+![Screenshot (86)](https://github.com/anafariya/ana-blog/assets/70438803/a06d8ccc-5f21-49aa-b3a4-1e2c5694bd6f)
+
+
 ## Introduction
 This project demonstrates the creation of a blog website using modern web development technologies. It leverages Next.js for server-side rendering and routing, TypeScript for type safety, Tailwind CSS for styling, and Sanity.io for content management.
 
