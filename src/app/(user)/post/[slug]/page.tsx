@@ -1,52 +1,53 @@
-import { groq } from "next-sanity";
-import { client } from "../../../../../lib/sanity.client";
-import Image from "next/image";
-import urlFor from "../../../../../lib/urlFor";
-import { PortableText } from '@portabletext/react'
-import {RichTextComponents} from "@/components/RichTextComponents";
-type Props = {
+"use client"
+
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import urlFor from '../../../../../lib/urlFor';
+import { PortableText } from '@portabletext/react';
+import { RichTextComponents } from '@/components/RichTextComponents';
+import { groq } from 'next-sanity';
+import { client } from '../../../../../lib/sanity.client';
+
+type PostProps = {
   params: {
     slug: string;
   };
 };
 
-export const revalidate = 60
+export default function Post({ params }: PostProps) {
+  const [post, setPost] = useState<Post | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export async function getStaticPaths() {
-  const query = groq `*[_type=='post']
-  {
-    slug
+  useEffect(() => {
+    async function fetchPost() {
+      try {
+        const query = groq`
+          *[_type == 'post' && slug.current == $slug][0] {
+            ...,
+            author->,
+            categories[]->
+          }
+        `;
+        const postData = await client.fetch(query, { slug: params.slug });
+        setPost(postData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching post:', error);
+        setLoading(false);
+      }
+    }
+
+    fetchPost();
+  }, [params.slug]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
-  `
-  const slugs : Post[] = await client.fetch(query)
-  const slugRoutes = slugs.map((slug) => slug.slug.current)
 
-  return {
-    paths: slugRoutes.map(slug => ({ params: { slug } })),
-    fallback: false
-  };
-}
+  if (!post) {
+    return <div>Post not found.</div>;
+  }
 
-export async function getStaticProps({ params }: { params: { slug: string } }) {
-  const query = groq`
-    *[_type == 'post' && slug.current == $slug][0]
-    {
-        ...,
-        author->,
-        categories[]->
-    }
-    `;
-
-  const post: Post = await client.fetch(query, { slug: params.slug });
-  
-  return {
-    props: {
-      post
-    }
-  };
-}
-
-function Post({ post }: { post: Post }) {
   return (
     <article className="px-10 pb-28">
       <section className="space-y-2 border border-red-300 text-black">
@@ -64,10 +65,10 @@ function Post({ post }: { post: Post }) {
               <div>
                 <h1 className="text-4xl font-extrabold">{post.title}</h1>
                 <p>
-                  {new Date(post._createdAt).toLocaleDateString("en-US", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
+                  {new Date(post._createdAt).toLocaleDateString('en-US', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
                   })}
                 </p>
               </div>
@@ -87,10 +88,9 @@ function Post({ post }: { post: Post }) {
             </div>
 
             <div className="flex items-center justify-end">
-                <h4 className="bg-red-950 text-white px-3 py-1 rounded-full text-sm font-semibold mt-4">
+              <h4 className="bg-red-950 text-white px-3 py-1 rounded-full text-sm font-semibold mt-4">
                 {post.categories[0].title}
-
-                </h4>
+              </h4>
             </div>
           </section>
         </div>
@@ -100,5 +100,3 @@ function Post({ post }: { post: Post }) {
     </article>
   );
 }
-
-export default Post;
