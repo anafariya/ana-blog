@@ -12,7 +12,7 @@ type Props = {
 
 export const revalidate = 60
 
-export async function generalStaticParams() {
+export async function getStaticPaths() {
   const query = groq `*[_type=='post']
   {
     slug
@@ -21,12 +21,13 @@ export async function generalStaticParams() {
   const slugs : Post[] = await client.fetch(query)
   const slugRoutes = slugs.map((slug) => slug.slug.current)
 
-  return slugRoutes.map(slug => ({
-    slug
-  }))
+  return {
+    paths: slugRoutes.map(slug => ({ params: { slug } })),
+    fallback: false
+  };
 }
 
-async function Post({ params: { slug } }: Props) {
+export async function getStaticProps({ params }: { params: { slug: string } }) {
   const query = groq`
     *[_type == 'post' && slug.current == $slug][0]
     {
@@ -36,7 +37,16 @@ async function Post({ params: { slug } }: Props) {
     }
     `;
 
-  const post: Post = await client.fetch(query, { slug });
+  const post: Post = await client.fetch(query, { slug: params.slug });
+  
+  return {
+    props: {
+      post
+    }
+  };
+}
+
+function Post({ post }: { post: Post }) {
   return (
     <article className="px-10 pb-28">
       <section className="space-y-2 border border-red-300 text-black">
