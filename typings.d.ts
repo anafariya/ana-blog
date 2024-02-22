@@ -18,7 +18,7 @@ interface Post extends Base {
 
 interface Author extends Base {
     bio: Block[]
-    iamge: Image
+    image: Image
     name: string
     slug: Slug
 }
