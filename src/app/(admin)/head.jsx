@@ -3,7 +3,7 @@ export {NextStudioHead as default} from 'next-sanity/studio/head'
 // To customize it, use it as a children component:
 import {NextStudioHead} from 'next-sanity/studio/head'
 
-export default function CustomStudioHead() {
+export function CustomStudioHead() {
   return (
     <>
       <NextStudioHead favicons={false} />
